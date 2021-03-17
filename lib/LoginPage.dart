@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:internship_app/SecretPage.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'google_sign_in.dart';
 class LoginPage extends StatefulWidget {
@@ -74,9 +75,12 @@ class _LoginPageState extends State<LoginPage> {
                               context, listen: false);
                           GoogleSignInProvider googleSignInProvider = new GoogleSignInProvider();
                           print("CU${googleSignInProvider.user}");
-                          provider.login().then((value){
+                          provider.login().then((value) async {
                             GoogleSignInProvider googleSignInProvider = new GoogleSignInProvider();
                             googleSignInProvider.userData = value;
+                           final SharedPreferences pref = await SharedPreferences.getInstance();
+                           pref.setString('currentUserId', value);
+                           print('CurrentID${pref.getString('currentUserId')}');
                             setState(() {
                               _isLoading = false;
                             });
