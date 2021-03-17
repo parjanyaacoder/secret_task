@@ -1,7 +1,14 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:internship_app/LoginPage.dart';
+import 'package:internship_app/SecretPage.dart';
+import 'package:internship_app/google_sign_in.dart';
+import 'package:provider/provider.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
   runApp(MyApp());
 }
 
@@ -23,7 +30,48 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: LoginPage(),
+      routes: {
+        'home':(c) => MyInternshipApp(),
+        'Login':(c) => LoginPage(),
+        'Secret':(c) => SecretPage(),
+      },
+      home: ChangeNotifierProvider<GoogleSignInProvider>(create: (context) => GoogleSignInProvider(),child: MyInternshipApp()),
     );
+  }
+}
+class MyInternshipApp extends StatefulWidget {
+  @override
+  _MyInternshipAppState createState() => _MyInternshipAppState();
+}
+
+class _MyInternshipAppState extends State<MyInternshipApp> {
+
+  @override
+  void initState() {
+    Provider.of<GoogleSignInProvider>(context,listen: false);
+    super.initState();
+  }
+
+  Future getProvider() async {
+    return  Provider.of<GoogleSignInProvider>(context,listen: false);
+  }
+
+  // Widget startScreen ()
+  // {
+  //   if(Provider.of<GoogleSignInProvider>(context,listen: false).googleSignIn.currentUser != null)
+  //     return SecretPage();
+  //   return LoginPage();
+  // }
+
+  @override
+  Widget build(BuildContext context) {
+
+    return FutureBuilder(
+        future: getProvider(),
+        builder: (BuildContext context,snapshot) {
+        return  Provider.of<GoogleSignInProvider>(context,listen: false).googleSignIn.currentUser != null
+            ?  SecretPage() : LoginPage();
+        },
+        );
   }
 }
